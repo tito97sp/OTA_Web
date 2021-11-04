@@ -1,0 +1,92 @@
+﻿@model OTAWebApp.ViewModels.SoftwareTypeIndexData
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Last Update
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.SoftwareTypes)
+        {
+            string selectedRow = "";
+            if (item.Id == ViewBag.SoftwareTypeID)
+            {
+                selectedRow = "table-success";
+            }
+            <tr class="@selectedRow">
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+                    
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @*@Html.DisplayFor(modelItem => item.SoftwareVersions.OrderBy(i => i.Date).Single().Date);*@
+                    --
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.SoftwareVersions != null)
+{
+    <h3>Available Versions</h3>
+    <table class="table">
+        <tr>
+            <th>Version</th>
+            <th>Autor</th>
+            <th>Date</th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.SoftwareVersions)
+        {
+            string selectedRow = "";
+            if (item.Id == ViewBag.SoftwareVersionsID)
+            {
+                selectedRow = "success";
+            }
+            <tr class="@selectedRow">
+                <td>
+                    @item.FullVersion
+                </td>
+                <td>
+                    @item.Author
+                </td>
+                <td>
+                    @item.Date
+                </td>
+                <td>
+                    @Html.ActionLink("Select", "Index", new { SoftwareVersionsID = item.Id })
+                </td>
+            </tr>
+        }
+
+    </table>
+}

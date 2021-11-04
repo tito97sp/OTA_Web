@@ -1,0 +1,81 @@
+﻿@model OTAWebApp.ViewModels.SoftwareTypeIndexData
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@ViewBag.SoftwareTypeName</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SoftwareTypes.First().Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SoftwareTypes.First().Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SoftwareTypes.First().Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SoftwareTypes.First().Date)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SoftwareTypes.First().Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SoftwareTypes.First().Description)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.SoftwareTypes.First().Id">Edit</a> |
+    <a asp-action="Delete" asp-route-id="@Model.SoftwareTypes.First().Id">Delete</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<div>
+    <hr />
+    @if (Model.SoftwareVersions != null)
+    {
+        <h3>Reported Versions</h3>
+
+        <table class="table">
+            <tr>
+                <th>Version</th>
+                <th>Autor</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.SoftwareVersions)
+            {
+                string selectedRow = "";
+                if (item.Id == ViewBag.SoftwareVersionsID)
+                {
+                    selectedRow = "success";
+                }
+                <tr class="@selectedRow">
+                    <td>
+                        @item.FullVersion
+                    </td>
+                    <td>
+                        @item.Author
+                    </td>
+                    <td>
+                        @item.Date
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-controller="SoftwareVersions" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Edit" asp-controller="SoftwareVersions" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-controller="SoftwareVersions" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+
+    <a asp-action="Create" asp-controller="SoftwareVersions" asp-route-id="@Model.SoftwareTypes.First().Id">Add new version</a>
+</div>
