@@ -46,9 +46,9 @@ namespace OTAWebApp.Controllers
         }
 
         // GET: SoftwareVersions/Create
-        public IActionResult Create(int id)
-        {
-            ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id");
+        public IActionResult Create(int SoftwareTypeId)
+        { 
+            ViewBag.SoftwareTypeId = SoftwareTypeId;
             return View();
         }
 
@@ -57,10 +57,12 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author,Date,FirmwarePath")] SoftwareVersion softwareVersion)
+        public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion)
         {
             if (ModelState.IsValid)
             {
+                softwareVersion.Date = DateTime.Now;
+
                 _context.Add(softwareVersion);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
