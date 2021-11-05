@@ -1,0 +1,45 @@
+# This workflow will push a new container image to Linux web server,
+# and then deploy it when there is a push to the production branch.
+
+name: deploy to development
+
+on:
+  push:
+    branches:
+      - development
+
+env:
+  SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+  REMOTE_HOST: ${{ secrets.DEVEL_HOST }}
+  REMOTE_USER: ${{ secrets.DEVEL_USER }}
+  REMOTE_PORT: ${{ secrets.DEVEL_PORT }}
+  SOURCE: "dist/"
+  TARGET: ${{ secrets.DEVL_TARGET }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure SSH credentials
+        
+    - name: SSH Deploy
+      uses: easingthemes/ssh-deploy@v2.1.4
+        
+    - name: Build, tag, and push image to development server
+      id: build-image
+      #env:
+      #  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #  IMAGE_TAG: ${{ github.sha }}
+      #run: |
+        # Build a docker container and
+        # push it to ECR so that it can
+        # be deployed to ECS.
+      #  docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+      #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      #   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
