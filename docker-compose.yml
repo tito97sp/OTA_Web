@@ -9,6 +9,8 @@ services:
       - SA_PASSWORD=DbPassword1#
     ports:
       - 1433:1433
+    volumes:
+      - mssql_vol:/var/opt/mssql
 
   otawebapp:
     image: ${DOCKER_REGISTRY-}otawebapp
@@ -17,3 +19,6 @@ services:
       dockerfile: OTAWebApp/Dockerfile
     depends_on:
       - ota_db
+
+volumes:
+  mssql_vol:
