@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OTAWebApp", "OTAWebApp\OTAWebApp.csproj", "{99E16E38-DAAD-4958-9E9A-70957BDF26FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OTAWebApp", "OTAWebApp\OTAWebApp.csproj", "{99E16E38-DAAD-4958-9E9A-70957BDF26FD}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{BB569CC5-4EE0-4C25-B5BC-1480A8C634FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{99E16E38-DAAD-4958-9E9A-70957BDF26FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99E16E38-DAAD-4958-9E9A-70957BDF26FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99E16E38-DAAD-4958-9E9A-70957BDF26FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB569CC5-4EE0-4C25-B5BC-1480A8C634FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB569CC5-4EE0-4C25-B5BC-1480A8C634FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB569CC5-4EE0-4C25-B5BC-1480A8C634FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB569CC5-4EE0-4C25-B5BC-1480A8C634FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
