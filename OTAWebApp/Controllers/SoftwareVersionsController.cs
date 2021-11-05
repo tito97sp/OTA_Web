@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -59,16 +62,127 @@ namespace OTAWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion)
         {
+            const string FTPServerBaseUrl = "ftp://127.0.0.1/";
+
+            IFormFileCollection files = Request.Form.Files;
+            if (files.Count == 0 || files.Count > 1)
+            {
+                return new BadRequestResult();
+            }
+
+            foreach (var file in files)
+            {
+                FileInfo fi = new FileInfo(file.FileName);
+
+                // Get the path => ~/User/SoftwareTypeName/
+                string FTPServerPath = "";
+                SoftwareType softwareType = _context.SoftwareType.Where(b => b.Id.Equals(softwareVersion.SoftwareTypeId)).FirstOrDefault();
+                if (softwareType != null)   //Check if exists.
+                {
+                    FTPServerPath = softwareType.Name + "/";
+
+                    // check if directory exists
+                    try
+                    {
+                        string route = FTPServerBaseUrl + FTPServerPath;
+                        FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
+                        //softwareVersion.FirmwarePath = route;
+
+                        request.Method = WebRequestMethods.Ftp.MakeDirectory;
+
+                        //Enter FTP Server credentials.
+                        request.Credentials = new NetworkCredential("asanchez", "eskidefondo");
+                        request.UsePassive = true;
+                        request.UseBinary = true;
+                        request.EnableSsl = false;
+
+                        FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                        if (response.StatusCode != FtpStatusCode.PathnameCreated)
+                        {
+                            // Folder already created.
+                        }
+
+                        response.Close();
+                    }
+                    catch (WebException ex)
+                    {
+                        //return new BadRequestResult();
+                        //throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
+                    }
+
+                    // Get the file name => /Major_Minor_Patch_Label_UniqueGuid;
+                    string FileName = softwareVersion.Major.ToString() + "_" + softwareVersion.Minor.ToString() + "_" + softwareVersion.Patch.ToString() + "_"
+                        + softwareVersion.Label.ToString() + "_" + Guid.NewGuid().ToString() + fi.Extension;
+
+                    MemoryStream fileStream = new MemoryStream();
+                    file.CopyTo(fileStream);
+
+                    try
+                    {
+                        string route = FTPServerBaseUrl + FTPServerPath + FileName;
+
+                        FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
+                        softwareVersion.FirmwarePath = route;
+
+                        request.Method = WebRequestMethods.Ftp.UploadFile;
+
+                        //Enter FTP Server credentials.
+                        request.Credentials = new NetworkCredential("asanchez", "eskidefondo");
+                        request.ContentLength = fileStream.Length;
+                        request.UsePassive = true;
+                        request.UseBinary = true;
+                        request.ServicePoint.ConnectionLimit = (int)fileStream.Length;
+                        request.EnableSsl = false;
+
+                        using (Stream requestStream = request.GetRequestStream())
+                        {
+                            requestStream.Write(fileStream.GetBuffer(), 0, (int)fileStream.Length);
+                            requestStream.Close();
+                        }
+
+                        FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                        //lblMessage.Text += FileName + " uploaded.<br />";
+                        response.Close();
+
+                        //return new OkResult();
+                    }
+                    catch (WebException ex)
+                    {
+                        return new BadRequestResult();
+                        throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
+                    }
+                }
+                else
+                {
+                    return new NotFoundResult();
+                }
+            }
+
+            softwareVersion.Date = DateTime.Now;
+
             if (ModelState.IsValid)
             {
-                softwareVersion.Date = DateTime.Now;
-
                 _context.Add(softwareVersion);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { softwareTypeId = softwareVersion.SoftwareTypeId });
             }
-            ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", softwareVersion.SoftwareTypeId);
-            return View(softwareVersion);
+            //return View(softwareVersion);
+
+            ViewData.Add("SoftwareTypeId", softwareVersion.SoftwareTypeId);
+            return View(await _context.SoftwareVersion.ToListAsync());
+
+            //if (ModelState.IsValid)
+            //{
+            //    softwareVersion.Date = DateTime.Now;
+
+            //    _context.Add(softwareVersion);
+            //    await _context.SaveChangesAsync();
+            //    return RedirectToAction(nameof(Index));
+            //}
+            //#ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", softwareVersion.SoftwareTypeId);
+            //return View(softwareVersion);
         }
 
         // GET: SoftwareVersions/Edit/5

@@ -15,8 +15,12 @@ services:
   otawebapp:
     image: ${DOCKER_REGISTRY-}otawebapp
     build:
+      network: host
       context: .
       dockerfile: OTAWebApp/Dockerfile
+    ports:
+      - 21:21
+      - 22:22
     depends_on:
       - ota_db
 
