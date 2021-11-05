@@ -26,13 +26,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Configure SSH credentials
+    #- name: Configure SSH credentials
         
-    - name: SSH Deploy
-      uses: easingthemes/ssh-deploy@v2.1.4
+      #- name: SSH Deploy
+      # uses: easingthemes/ssh-deploy@v2.1.4
         
-    - name: Build, tag, and push image to development server
-      id: build-image
+      #- name: Build, tag, and push image to development server
+      #id: build-image
       #env:
       #  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       #  IMAGE_TAG: ${{ github.sha }}
