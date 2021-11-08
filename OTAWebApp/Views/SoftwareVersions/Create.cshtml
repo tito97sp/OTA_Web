@@ -19,32 +19,32 @@
             </div>
             <div class="form-group">
                 <label asp-for="Major" class="control-label"></label>
-                <input asp-for="Major" class="form-control" />
+                <input asp-for="Major" class="form-control" required/>
                 <span asp-validation-for="Major" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Minor" class="control-label"></label>
-                <input asp-for="Minor" class="form-control" />
+                <input asp-for="Minor" class="form-control" required/>
                 <span asp-validation-for="Minor" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Patch" class="control-label"></label>
-                <input asp-for="Patch" class="form-control" />
+                <input asp-for="Patch" class="form-control" required/>
                 <span asp-validation-for="Patch" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Label" class="control-label"></label>
-                <input asp-for="Label" class="form-control" />
+                <input asp-for="Label" class="form-control" required/>
                 <span asp-validation-for="Label" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Author" class="control-label"></label>
-                <input asp-for="Author" class="form-control" />
+                <input asp-for="Author" class="form-control" required/>
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <p>Upload one or more files using this form:</p>
-                <input type="file" name="files" />
+                <input type="file" name="files" required/>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

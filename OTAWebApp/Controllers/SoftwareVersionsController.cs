@@ -62,7 +62,7 @@ namespace OTAWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion)
         {
-            const string FTPServerBaseUrl = "ftp://127.0.0.1/";
+            const string FTPServerBaseUrl = "ftp://ftpd_server/";
 
             IFormFileCollection files = Request.Form.Files;
             if (files.Count == 0 || files.Count > 1)
@@ -166,23 +166,13 @@ namespace OTAWebApp.Controllers
             {
                 _context.Add(softwareVersion);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new { softwareTypeId = softwareVersion.SoftwareTypeId });
+                ViewData.Add("SoftwareTypeId", softwareVersion.SoftwareTypeId);
+                return RedirectToAction("Details", "SoftwareTypes", new { id = softwareVersion.SoftwareTypeId });
             }
             //return View(softwareVersion);
 
             ViewData.Add("SoftwareTypeId", softwareVersion.SoftwareTypeId);
-            return View(await _context.SoftwareVersion.ToListAsync());
-
-            //if (ModelState.IsValid)
-            //{
-            //    softwareVersion.Date = DateTime.Now;
-
-            //    _context.Add(softwareVersion);
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //#ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", softwareVersion.SoftwareTypeId);
-            //return View(softwareVersion);
+            return RedirectToAction("Details", "SoftwareTypes", new { id = softwareVersion.SoftwareTypeId });
         }
 
         // GET: SoftwareVersions/Edit/5
@@ -263,9 +253,40 @@ namespace OTAWebApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var softwareVersion = await _context.SoftwareVersion.FindAsync(id);
+            
+            try
+            {
+                string route = softwareVersion.FirmwarePath;
+
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
+                request.Method = WebRequestMethods.Ftp.DeleteFile;
+
+                //Enter FTP Server credentials.
+                request.Credentials = new NetworkCredential("asanchez", "eskidefondo");
+                request.UsePassive = true;
+                request.UseBinary = true;
+                request.EnableSsl = false;
+
+                FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                if (response.StatusCode != FtpStatusCode.FileActionOK)
+                {
+                    //return RedirectToAction(nameof(Index));
+                }
+
+                response.Close();
+            }
+            catch (WebException ex)
+            {
+                //return new BadRequestResult();
+                throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
+            }
+
             _context.SoftwareVersion.Remove(softwareVersion);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            ViewData.Add("SoftwareTypeId", softwareVersion.SoftwareTypeId);
+            return RedirectToAction("Details", "SoftwareTypes", new { id = softwareVersion.SoftwareTypeId });
+            //return View(softwareVersion);
         }
 
         private bool SoftwareVersionExists(int id)

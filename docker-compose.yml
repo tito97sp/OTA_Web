@@ -1,6 +1,26 @@
 ﻿version: '3.4'
 
 services:
+  ftpd_server:
+    image: stilliard/pure-ftpd
+    container_name: ota-ftpd
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    volumes: 
+      - "./ftp/data:/home/username/"
+      - "./ftp/passwd:/etc/pure-ftpd/passwd"
+    environment:
+      PUBLICHOST: localhost
+      FTP_USER_NAME: "asanchez"
+      FTP_USER_PASS: "eskidefondo"
+      FTP_USER_HOME: "/home/asanchez"
+    networks:
+      - ota_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
   ota_db:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
     container_name: ota_mssql
@@ -11,6 +31,10 @@ services:
       - 1433:1433
     volumes:
       - mssql_vol:/var/opt/mssql
+    networks:
+      - ota_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   otawebapp:
     image: ${DOCKER_REGISTRY-}otawebapp
@@ -18,11 +42,16 @@ services:
       network: host
       context: .
       dockerfile: OTAWebApp/Dockerfile
-    ports:
-      - 21:21
-      - 22:22
     depends_on:
       - ota_db
+      - ftpd_server
+    networks:
+      - ota_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   mssql_vol:
+  
+networks:
+  ota_network:
