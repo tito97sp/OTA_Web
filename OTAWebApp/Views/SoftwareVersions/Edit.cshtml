@@ -39,6 +39,35 @@
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="SupportedHardware" class="control-label"></label>
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                                List<OTAWebApp.ViewModels.AssignedHardwareTypeData> HardwareTypes = ViewBag.HardwareTypes;
+
+                                foreach (var hardwareType in HardwareTypes)
+                                {
+                                    if (cnt++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedHardwareTypes"
+                                               value="@hardwareType.HardwareTypeId"
+                                               @(Html.Raw(hardwareType.Assigned ? "checked=\"checked\"" : "")) />
+                                        @hardwareType.Name
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                    </table>
+                </div>
+                
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>

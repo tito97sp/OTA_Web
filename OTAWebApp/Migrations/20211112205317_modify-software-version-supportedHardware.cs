@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace OTAWebApp.Data.Migrations
+namespace OTAWebApp.Migrations
 {
-    public partial class SoftwareVersions : Migration
+    public partial class modifysoftwareversionsupportedHardware : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

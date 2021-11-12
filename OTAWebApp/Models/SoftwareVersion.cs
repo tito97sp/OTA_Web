@@ -44,5 +44,6 @@ namespace OTAWebApp.Models
 
         public virtual SoftwareType SoftwareType { get; set; }
        
+        public virtual ICollection<HardwareType> SupportedHardware { get; set; }
     }
 }

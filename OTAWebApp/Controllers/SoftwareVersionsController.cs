@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OTAWebApp.Data;
 using OTAWebApp.Models;
+using OTAWebApp.ViewModels;
 
 namespace OTAWebApp.Controllers
 {
@@ -50,7 +51,20 @@ namespace OTAWebApp.Controllers
 
         // GET: SoftwareVersions/Create
         public IActionResult Create(int SoftwareTypeId)
-        { 
+        {
+            var allHardwareTypes = _context.HardwareType.ToList();
+            var hardwareTypes = new List<AssignedHardwareTypeData>();
+            foreach (var hardwareType in allHardwareTypes) 
+            {
+                hardwareTypes.Add(new AssignedHardwareTypeData
+                {
+                    HardwareTypeId = hardwareType.Id,
+                    Name = hardwareType.Name,
+                    Assigned = false
+                });
+            }
+
+            ViewBag.HardwareTypes = hardwareTypes;
             ViewBag.SoftwareTypeId = SoftwareTypeId;
             return View();
         }
@@ -60,8 +74,10 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion)
+        public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion, string[] selectedHardwareTypes)
         {
+
+#if USE_FTP
             const string FTPServerBaseUrl = "ftp://ftpd_server/";
 
             IFormFileCollection files = Request.Form.Files;
@@ -159,8 +175,19 @@ namespace OTAWebApp.Controllers
                     return new NotFoundResult();
                 }
             }
-
+#endif
+            softwareVersion.FirmwarePath = "route";
             softwareVersion.Date = DateTime.Now;
+            
+            if (selectedHardwareTypes == null)
+            {
+                softwareVersion.SupportedHardware = new List<HardwareType>();
+            }
+            foreach (var hardwareId in selectedHardwareTypes) 
+            {
+                softwareVersion.SupportedHardware = new List<HardwareType>();
+                softwareVersion.SupportedHardware.Add(_context.HardwareType.Where(i => i.Id.ToString() == hardwareId).FirstOrDefault());
+            }
 
             if (ModelState.IsValid)
             {
@@ -183,11 +210,30 @@ namespace OTAWebApp.Controllers
                 return NotFound();
             }
 
-            var softwareVersion = await _context.SoftwareVersion.FindAsync(id);
+            var softwareVersion = _context.SoftwareVersion
+                .Include(i => i.SupportedHardware)
+                .Where(i => i.Id == id)
+                .Single();
+
             if (softwareVersion == null)
             {
                 return NotFound();
             }
+
+            var allHardwareTypes = _context.HardwareType;
+            var supportedHardware = new HashSet<int>(softwareVersion.SupportedHardware.Select(c => c.Id));
+            var hardwareTypes = new List<AssignedHardwareTypeData>();
+            foreach (var hardwareType in allHardwareTypes)
+            {
+                hardwareTypes.Add(new AssignedHardwareTypeData
+                {
+                     HardwareTypeId = hardwareType.Id,
+                     Name = hardwareType.Name,
+                     Assigned = supportedHardware.Contains(hardwareType.Id)
+                });
+            }
+            ViewBag.HardwareTypes = hardwareTypes;
+        
             ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", softwareVersion.SoftwareTypeId);
             return View(softwareVersion);
         }
@@ -197,18 +243,54 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author,Date,FirmwarePath")] SoftwareVersion softwareVersion)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion, string[] selectedHardwareTypes)
         {
             if (id != softwareVersion.Id)
             {
                 return NotFound();
             }
 
+            var SoftwareVersionToUpdate = _context.SoftwareVersion
+               .Include(i => i.SupportedHardware)
+               .Where(i => i.Id == id)
+               .Single();
+
+            if (selectedHardwareTypes != null)
+            {
+                if (selectedHardwareTypes == null)
+                {
+                    SoftwareVersionToUpdate.SupportedHardware = new List<HardwareType>();
+                }
+
+                var selectedHardwareTypesHS = new HashSet<string>(selectedHardwareTypes);
+                var softwareHardwareTypes = new HashSet<int>(SoftwareVersionToUpdate.SupportedHardware.Select(c => c.Id));
+
+                foreach (var hardwareType in _context.HardwareType)
+                {
+                    if (selectedHardwareTypesHS.Contains(hardwareType.Id.ToString()))
+                    {
+                        if (!softwareHardwareTypes.Contains(hardwareType.Id))
+                        {
+                            SoftwareVersionToUpdate.SupportedHardware.Add(hardwareType);
+                        }
+                    }
+                    else
+                    {
+                        if (softwareHardwareTypes.Contains(hardwareType.Id))
+                        {
+                            SoftwareVersionToUpdate.SupportedHardware.Remove(hardwareType);
+                        }
+                    }
+                }
+            }
+
+            //softwareVersion.SupportedHardware = SoftwareVersionToUpdate.SupportedHardware;
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(softwareVersion);
+                    _context.Update(SoftwareVersionToUpdate);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -253,7 +335,7 @@ namespace OTAWebApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var softwareVersion = await _context.SoftwareVersion.FindAsync(id);
-            
+#if USE_FTP
             try
             {
                 string route = softwareVersion.FirmwarePath;
@@ -281,7 +363,7 @@ namespace OTAWebApp.Controllers
                 //return new BadRequestResult();
                 throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
             }
-
+#endif
             _context.SoftwareVersion.Remove(softwareVersion);
             await _context.SaveChangesAsync();
             ViewData.Add("SoftwareTypeId", softwareVersion.SoftwareTypeId);

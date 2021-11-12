@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OTAWebApp.Data;
 
-namespace OTAWebApp.Data.Migrations
+namespace OTAWebApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -16,7 +16,7 @@ namespace OTAWebApp.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.11")
+                .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -219,6 +219,57 @@ namespace OTAWebApp.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("OTAWebApp.Models.Device", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("HardwareTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NickName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SerialNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SoftwareTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HardwareTypeId");
+
+                    b.HasIndex("SoftwareTypeId");
+
+                    b.ToTable("Device");
+                });
+
+            modelBuilder.Entity("OTAWebApp.Models.HardwareType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SoftwareVersionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SoftwareVersionId");
+
+                    b.ToTable("HardwareType");
+                });
+
             modelBuilder.Entity("OTAWebApp.Models.SoftwareType", b =>
                 {
                     b.Property<int>("Id")
@@ -248,7 +299,9 @@ namespace OTAWebApp.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Author")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -257,7 +310,9 @@ namespace OTAWebApp.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Label")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<long>("Major")
                         .HasColumnType("bigint");
@@ -329,6 +384,32 @@ namespace OTAWebApp.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("OTAWebApp.Models.Device", b =>
+                {
+                    b.HasOne("OTAWebApp.Models.HardwareType", "HardwareType")
+                        .WithMany()
+                        .HasForeignKey("HardwareTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OTAWebApp.Models.SoftwareType", "SoftwareType")
+                        .WithMany()
+                        .HasForeignKey("SoftwareTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HardwareType");
+
+                    b.Navigation("SoftwareType");
+                });
+
+            modelBuilder.Entity("OTAWebApp.Models.HardwareType", b =>
+                {
+                    b.HasOne("OTAWebApp.Models.SoftwareVersion", null)
+                        .WithMany("SupportedHardware")
+                        .HasForeignKey("SoftwareVersionId");
+                });
+
             modelBuilder.Entity("OTAWebApp.Models.SoftwareVersion", b =>
                 {
                     b.HasOne("OTAWebApp.Models.SoftwareType", "SoftwareType")
@@ -343,6 +424,11 @@ namespace OTAWebApp.Data.Migrations
             modelBuilder.Entity("OTAWebApp.Models.SoftwareType", b =>
                 {
                     b.Navigation("SoftwareVersions");
+                });
+
+            modelBuilder.Entity("OTAWebApp.Models.SoftwareVersion", b =>
+                {
+                    b.Navigation("SupportedHardware");
                 });
 #pragma warning restore 612, 618
         }
