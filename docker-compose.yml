@@ -11,6 +11,7 @@ services:
       - "./ftp/data:/home/username/"
       - "./ftp/passwd:/etc/pure-ftpd/passwd"
     environment:
+      DOCKER: "true"
       PUBLICHOST: localhost
       FTP_USER_NAME: "asanchez"
       FTP_USER_PASS: "eskidefondo"
@@ -35,6 +36,7 @@ services:
       - ota_network
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    restart: always
 
   otawebapp:
     image: ${DOCKER_REGISTRY-}otawebapp
@@ -49,6 +51,7 @@ services:
       - ota_network
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    restart: always
 
 volumes:
   mssql_vol:
