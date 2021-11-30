@@ -24,7 +24,49 @@ namespace OTAWebApp.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            StringValues BoardId;
+            StringValues CurrentVersion;
+
+            Request.Headers.TryGetValue("BoardId", out BoardId);
+            Request.Headers.TryGetValue("CurrentVersion", out CurrentVersion);
+
+
+            const string FTPServerBaseUrl = "ftp://127.0.0.1/Test/test.txt";
+
+
+            try
+            {
+                string route = FTPServerBaseUrl;
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
+
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+
+                //Enter FTP Server credentials.
+                request.Credentials = new NetworkCredential("asanchez", "eskidefondo");
+                request.UsePassive = true;
+                request.UseBinary = true;
+                request.EnableSsl = false;
+
+                FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                if (response.StatusCode != FtpStatusCode.FileActionOK)
+                {
+                    // Folder already created.
+                }
+
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    response.GetResponseStream().CopyTo(stream);
+                    response.Close();
+
+                    return File(stream.GetBuffer(), MediaTypeNames.Text.Plain, "test.txt");
+                }
+            }
+            catch (WebException ex)
+            {
+                throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
+            }
+            return new NoContentResult();
         }
 
 
