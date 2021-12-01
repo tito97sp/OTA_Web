@@ -8,8 +8,8 @@ services:
       - "21:21"
       - "30000-30009:30000-30009"
     volumes: 
-      - "./ftp/data:/home/username/"
-      - "./ftp/passwd:/etc/pure-ftpd/passwd"
+      - "ftpd_vol:/home/username/"
+      - "ftpd_vol:/etc/pure-ftpd/passwd"
     environment:
       DOCKER: "true"
       PUBLICHOST: localhost
@@ -20,7 +20,6 @@ services:
       - ota_network
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: always
 
   ota_db:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
@@ -55,6 +54,8 @@ services:
 
 volumes:
   mssql_vol:
+  ftpd_vol:
+  
   
 networks:
   ota_network:
