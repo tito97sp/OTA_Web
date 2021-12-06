@@ -24,12 +24,21 @@ namespace OTAWebApp.Controllers
 
         public IActionResult Index()
         {
-            StringValues BoardId;
-            StringValues CurrentVersion;
+            StringValues DeviceID;
+            StringValues BoardVendor;
+            StringValues BoardModel;
+            StringValues BoardLabel;
+            StringValues SoftwareConf;
+            StringValues SoftwareVersion;
+            StringValues SoftwareGitHash;
 
-            Request.Headers.TryGetValue("BoardId", out BoardId);
-            Request.Headers.TryGetValue("CurrentVersion", out CurrentVersion);
-
+            Request.Headers.TryGetValue("DeviceID", out DeviceID);                  
+            Request.Headers.TryGetValue("BoardVendor", out BoardVendor);            
+            Request.Headers.TryGetValue("BoardModel", out BoardModel);            
+            Request.Headers.TryGetValue("BoardLabel", out BoardLabel);
+            Request.Headers.TryGetValue("SoftwareConf", out SoftwareConf);
+            Request.Headers.TryGetValue("SoftwareVersion", out SoftwareVersion);         
+            Request.Headers.TryGetValue("SoftwareGitHash", out SoftwareGitHash);    
 
             const string FTPServerBaseUrl = "ftp://127.0.0.1/Test/test.txt";
 

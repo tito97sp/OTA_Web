@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<OTAWebApp.Models.Device>
 
 @{
-    ViewData["Title"] = "Devices";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Devices</h1>
+<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -13,13 +13,40 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.NickName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.SerialNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BoardVendor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BoardModel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BoardLabel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Software)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SoftwareLabel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SoftwareVersion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GitHash)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstSeen)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastSeen)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Notes)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.HardwareType)
@@ -34,19 +61,46 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.NickName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SerialNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.HardwareType.Name)
+                @Html.DisplayFor(modelItem => item.BoardVendor)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SoftwareType.Name)
+                @Html.DisplayFor(modelItem => item.BoardModel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BoardLabel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Software)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoftwareLabel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoftwareVersion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GitHash)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstSeen)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastSeen)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Notes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HardwareType.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoftwareType.Id)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

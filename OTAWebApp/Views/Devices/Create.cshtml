@@ -13,11 +13,6 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="NickName" class="control-label"></label>
                 <input asp-for="NickName" class="form-control" />
                 <span asp-validation-for="NickName" class="text-danger"></span>
@@ -26,6 +21,56 @@
                 <label asp-for="SerialNumber" class="control-label"></label>
                 <input asp-for="SerialNumber" class="form-control" />
                 <span asp-validation-for="SerialNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoardVendor" class="control-label"></label>
+                <input asp-for="BoardVendor" class="form-control" />
+                <span asp-validation-for="BoardVendor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoardModel" class="control-label"></label>
+                <input asp-for="BoardModel" class="form-control" />
+                <span asp-validation-for="BoardModel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoardLabel" class="control-label"></label>
+                <input asp-for="BoardLabel" class="form-control" />
+                <span asp-validation-for="BoardLabel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Software" class="control-label"></label>
+                <input asp-for="Software" class="form-control" />
+                <span asp-validation-for="Software" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoftwareLabel" class="control-label"></label>
+                <input asp-for="SoftwareLabel" class="form-control" />
+                <span asp-validation-for="SoftwareLabel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoftwareVersion" class="control-label"></label>
+                <input asp-for="SoftwareVersion" class="form-control" />
+                <span asp-validation-for="SoftwareVersion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GitHash" class="control-label"></label>
+                <input asp-for="GitHash" class="form-control" />
+                <span asp-validation-for="GitHash" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstSeen" class="control-label"></label>
+                <input asp-for="FirstSeen" class="form-control" />
+                <span asp-validation-for="FirstSeen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastSeen" class="control-label"></label>
+                <input asp-for="LastSeen" class="form-control" />
+                <span asp-validation-for="LastSeen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+                <span asp-validation-for="Notes" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="HardwareTypeId" class="control-label"></label>

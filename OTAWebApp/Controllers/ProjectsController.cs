@@ -10,23 +10,22 @@ using OTAWebApp.Models;
 
 namespace OTAWebApp.Controllers
 {
-    public class DevicesController : Controller
+    public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public DevicesController(ApplicationDbContext context)
+        public ProjectsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Devices
+        // GET: Projects
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Device.Include(d => d.HardwareType).Include(d => d.SoftwareType);
-            return View(await applicationDbContext.ToListAsync());
+                return View(await _context.Project.ToListAsync());
         }
 
-        // GET: Devices/Details/5
+        // GET: Projects/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,45 +33,39 @@ namespace OTAWebApp.Controllers
                 return NotFound();
             }
 
-            var device = await _context.Device
-                .Include(d => d.HardwareType)
-                .Include(d => d.SoftwareType)
+            var project = await _context.Project
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (device == null)
+            if (project == null)
             {
                 return NotFound();
             }
 
-            return View(device);
+            return View(project);
         }
 
-        // GET: Devices/Create
+        // GET: Projects/Create
         public IActionResult Create()
         {
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id");
-            ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id");
             return View();
         }
 
-        // POST: Devices/Create
+        // POST: Projects/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NickName,SerialNumber,BoardVendor,BoardModel,BoardLabel,Software,SoftwareLabel,SoftwareVersion,GitHash,FirstSeen,LastSeen,Notes,HardwareTypeId,SoftwareTypeId")] Device device)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,CreationDate,LastModificationDate")] Project project)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(device);
+                _context.Add(project);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id", device.HardwareTypeId);
-            ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", device.SoftwareTypeId);
-            return View(device);
+            return View(project);
         }
 
-        // GET: Devices/Edit/5
+        // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,24 +73,22 @@ namespace OTAWebApp.Controllers
                 return NotFound();
             }
 
-            var device = await _context.Device.FindAsync(id);
-            if (device == null)
+            var project = await _context.Project.FindAsync(id);
+            if (project == null)
             {
                 return NotFound();
             }
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id", device.HardwareTypeId);
-            ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", device.SoftwareTypeId);
-            return View(device);
+            return View(project);
         }
 
-        // POST: Devices/Edit/5
+        // POST: Projects/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NickName,SerialNumber,BoardVendor,BoardModel,BoardLabel,Software,SoftwareLabel,SoftwareVersion,GitHash,FirstSeen,LastSeen,Notes,HardwareTypeId,SoftwareTypeId")] Device device)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreationDate,LastModificationDate")] Project project)
         {
-            if (id != device.Id)
+            if (id != project.Id)
             {
                 return NotFound();
             }
@@ -106,12 +97,12 @@ namespace OTAWebApp.Controllers
             {
                 try
                 {
-                    _context.Update(device);
+                    _context.Update(project);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DeviceExists(device.Id))
+                    if (!ProjectExists(project.Id))
                     {
                         return NotFound();
                     }
@@ -122,12 +113,10 @@ namespace OTAWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id", device.HardwareTypeId);
-            ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", device.SoftwareTypeId);
-            return View(device);
+            return View(project);
         }
 
-        // GET: Devices/Delete/5
+        // GET: Projects/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,32 +124,30 @@ namespace OTAWebApp.Controllers
                 return NotFound();
             }
 
-            var device = await _context.Device
-                .Include(d => d.HardwareType)
-                .Include(d => d.SoftwareType)
+            var project = await _context.Project
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (device == null)
+            if (project == null)
             {
                 return NotFound();
             }
 
-            return View(device);
+            return View(project);
         }
 
-        // POST: Devices/Delete/5
+        // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var device = await _context.Device.FindAsync(id);
-            _context.Device.Remove(device);
+            var project = await _context.Project.FindAsync(id);
+            _context.Project.Remove(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DeviceExists(int id)
+        private bool ProjectExists(int id)
         {
-            return _context.Device.Any(e => e.Id == id);
+            return _context.Project.Any(e => e.Id == id);
         }
     }
 }

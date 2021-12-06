@@ -13,9 +13,9 @@ namespace OTAWebApp.Dal
         {
             var softwaretypes = new List<SoftwareType>
             {
-            new SoftwareType{ Name = "Nuttx_Firmwre", Date = DateTime.Parse("2002-09-01"), Description = "Firmware for nuttx"},
-            new SoftwareType{ Name = "Nuttx_Bootloader", Date = DateTime.Parse("2006-03-04"), Description = "Firmware for test OTA bootloader"},
-            new SoftwareType{ Name = "Linux_Firmwre", Date = DateTime.Parse("2008-12-01"), Description = "Firmware for linux"},
+            new SoftwareType{ Name = "Nuttx_Firmwre", CreationDate = DateTime.Parse("2002-09-01"), Description = "Firmware for nuttx"},
+            new SoftwareType{ Name = "Nuttx_Bootloader", CreationDate = DateTime.Parse("2006-03-04"), Description = "Firmware for test OTA bootloader"},
+            new SoftwareType{ Name = "Linux_Firmwre", CreationDate = DateTime.Parse("2008-12-01"), Description = "Firmware for linux"},
             };
 
             softwaretypes.ForEach(s => context.SoftwareTypes.Add(s));

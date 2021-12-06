@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Projects</h1>
+<h1>Software Type</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -27,20 +27,22 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.SoftwareTypes)
+        @if (Model.SoftwareTypes != null)
         {
-            string selectedRow = "";
-            if (item.Id == ViewBag.SoftwareTypeID)
+            foreach (var item in Model.SoftwareTypes)
             {
-                selectedRow = "table-success";
-            }
+                string selectedRow = "";
+                if (item.Id == ViewBag.SoftwareTypeID)
+                {
+                    selectedRow = "table-success";
+                }
             <tr class="@selectedRow">
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
                     
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Date)
+                    @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
@@ -50,6 +52,7 @@
                     --
                 </td>
             </tr>
+            }
         }
     </tbody>
 </table>

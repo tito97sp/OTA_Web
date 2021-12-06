@@ -21,22 +21,25 @@ namespace OTAWebApp.Controllers
         }
 
         // GET: SoftwareTypes
-        public async Task<IActionResult> Index(int? id)
+        public async Task<IActionResult> Index(int? id, int projectId)
         {
             var viewModel = new SoftwareTypeIndexData();
-            viewModel.SoftwareTypes = _context.SoftwareType
-                .Include(i => i.SoftwareVersions)
-                .OrderBy(i => i.Date);
 
-            if (id != null) 
-            {
-                ViewBag.SoftwareTypeID = id.Value;                    
-                viewModel.SoftwareVersions = viewModel.SoftwareTypes.Where(
-                    i => i.Id == id.Value).Single().SoftwareVersions;
-            }
+            viewModel.SoftwareTypes = _context.SoftwareType
+                .Include(i => i.Project)
+                .Where(i=> i.Project.Id.Equals(projectId))
+                .OrderBy(i => i.CreationDate);
+
+            //if (id != null) 
+            //{
+            //    ViewBag.SoftwareTypeID = id.Value;                    
+            //    viewModel.SoftwareVersions = viewModel.SoftwareTypes.Where(
+            //        i => i.Id == id.Value).Single().SoftwareVersions;
+            //}
 
             return View(viewModel);
         }
+
 
         // GET: SoftwareTypes/Details/5
         public async Task<IActionResult> Details(int id)
