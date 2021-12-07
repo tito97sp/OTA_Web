@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using OTAWebApp.Data;
 using System.Net.Mime;
+using Microsoft.EntityFrameworkCore;
 
 namespace OTAWebApp.Controllers
 {
@@ -25,6 +26,7 @@ namespace OTAWebApp.Controllers
         public IActionResult Index()
         {
             StringValues DeviceID;
+            StringValues ProjectName;
             StringValues BoardVendor;
             StringValues BoardModel;
             StringValues BoardLabel;
@@ -32,20 +34,62 @@ namespace OTAWebApp.Controllers
             StringValues SoftwareVersion;
             StringValues SoftwareGitHash;
 
-            Request.Headers.TryGetValue("DeviceID", out DeviceID);                  
+            Request.Headers.TryGetValue("DeviceID", out DeviceID);    
+            Request.Headers.TryGetValue("ProjectName", out ProjectName);
             Request.Headers.TryGetValue("BoardVendor", out BoardVendor);            
             Request.Headers.TryGetValue("BoardModel", out BoardModel);            
             Request.Headers.TryGetValue("BoardLabel", out BoardLabel);
             Request.Headers.TryGetValue("SoftwareConf", out SoftwareConf);
             Request.Headers.TryGetValue("SoftwareVersion", out SoftwareVersion);         
-            Request.Headers.TryGetValue("SoftwareGitHash", out SoftwareGitHash);    
+            Request.Headers.TryGetValue("SoftwareGitHash", out SoftwareGitHash);
 
-            const string FTPServerBaseUrl = "ftp://127.0.0.1/Test/test.txt";
+            ProjectName = "embedded_project_template";
+            SoftwareConf = "stm_nucleo-h743zi_main";
 
-
+#if DOCKER
+            const string FTPServerBaseUrl = "ftp://ftpd_server/";
+#else
+            const string FTPServerBaseUrl = "ftp://127.0.0.1/";
+#endif
+            //new
+            //{
+            //    SerialNumber = DeviceID,
+            //    BoardVendor = BoardVendor,
+            //    BoardModel = BoardModel,
+            //    BoardLabel = BoardLabel,
+            //    Software = ProjectName,
+            //    SoftwareLabel = SoftwareConf,
+            //    SoftwareVersion = SoftwareVersion,
+            //    GitHash = SoftwareGitHash
+            //}
             try
             {
-                string route = FTPServerBaseUrl;
+                var project = _context.Project
+                .Include(i => i.SoftwareTypes)
+                .Where(i => i.Name.Equals(ProjectName))
+                .Single();
+
+                var softwareType = project.SoftwareTypes
+                    .Where(i => i.Name.Equals(SoftwareConf))
+                    .Single();
+
+
+                var softwareVersion = _context.SoftwareVersion
+                    .Include(i => i.SoftwareType)
+                    .Where(i => i.SoftwareTypeId.Equals(softwareType.Id))
+                    .OrderByDescending(i => i.Date)
+                    .First();
+
+
+
+
+
+                string fileName = softwareVersion.Major + "_"
+                                    + softwareVersion.Minor + "_"
+                                    + softwareVersion.Patch + "_"
+                                    + softwareVersion.Label + ".bin";
+
+                string route = softwareVersion.FirmwarePath;
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
 
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
@@ -68,12 +112,20 @@ namespace OTAWebApp.Controllers
                     response.GetResponseStream().CopyTo(stream);
                     response.Close();
 
-                    return File(stream.GetBuffer(), MediaTypeNames.Text.Plain, "test.txt");
+
+                    return File(stream.GetBuffer(), MediaTypeNames.Text.Plain, fileName);
                 }
             }
             catch (WebException ex)
             {
                 throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
+            }
+            catch (Exception ex)
+            {
+                if (ex is ArgumentNullException || ex is InvalidOperationException) 
+                {
+                    return new NoContentResult();
+                }
             }
             return new NoContentResult();
         }

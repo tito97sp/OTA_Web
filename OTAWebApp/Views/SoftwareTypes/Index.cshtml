@@ -16,13 +16,10 @@
                 Name
             </th>
             <th>
-                Date
+                Creation Date
             </th>
             <th>
                 Description
-            </th>
-            <th>
-                Last Update
             </th>
         </tr>
     </thead>
@@ -39,17 +36,12 @@
             <tr class="@selectedRow">
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
-                    
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @*@Html.DisplayFor(modelItem => item.SoftwareVersions.OrderBy(i => i.Date).Single().Date);*@
-                    --
                 </td>
             </tr>
             }

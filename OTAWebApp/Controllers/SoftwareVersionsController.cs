@@ -54,19 +54,19 @@ namespace OTAWebApp.Controllers
         // GET: SoftwareVersions/Create
         public IActionResult Create(int SoftwareTypeId)
         {
-            var allHardwareTypes = _context.HardwareType.ToList();
-            var hardwareTypes = new List<AssignedHardwareTypeData>();
-            foreach (var hardwareType in allHardwareTypes) 
-            {
-                hardwareTypes.Add(new AssignedHardwareTypeData
-                {
-                    HardwareTypeId = hardwareType.Id,
-                    Name = hardwareType.Name,
-                    Assigned = false
-                });
-            }
+            //var allHardwareTypes = _context.HardwareType.ToList();
+            //var hardwareTypes = new List<AssignedHardwareTypeData>();
+            //foreach (var hardwareType in allHardwareTypes) 
+            //{
+            //    hardwareTypes.Add(new AssignedHardwareTypeData
+            //    {
+            //        HardwareTypeId = hardwareType.Id,
+            //        Name = hardwareType.Name,
+            //        Assigned = false
+            //    });
+            //}
 
-            ViewBag.HardwareTypes = hardwareTypes;
+            //ViewBag.HardwareTypes = hardwareTypes;
             ViewBag.SoftwareTypeId = SoftwareTypeId;
             return View();
         }
@@ -76,11 +76,15 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion, string[] selectedHardwareTypes)
+        public async Task<IActionResult> Create([Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion/* ,string[] selectedHardwareTypes*/)
         {
 
 #if USE_FTP
+#if DOCKER
             const string FTPServerBaseUrl = "ftp://ftpd_server/";
+#else
+            const string FTPServerBaseUrl = "ftp://127.0.0.1/";
+#endif
 
             IFormFileCollection files = Request.Form.Files;
             if (files.Count == 0 || files.Count > 1)
@@ -95,14 +99,18 @@ namespace OTAWebApp.Controllers
                 // Get the path => ~/User/SoftwareTypeName/
                 string FTPServerPath = "";
                 SoftwareType softwareType = _context.SoftwareType.Where(b => b.Id.Equals(softwareVersion.SoftwareTypeId)).FirstOrDefault();
+                Project project = _context.Project.Where(i => i.Id.Equals(softwareType.Id)).FirstOrDefault();
+                
                 if (softwareType != null)   //Check if exists.
                 {
-                    FTPServerPath = softwareType.Name + "/";
+                    string FTPServerProjectPaht = project.Name + "/";
+                    string FTPServerSoftwareTypePath = softwareType.Name + "/";
+                    FTPServerPath = FTPServerProjectPaht + FTPServerSoftwareTypePath;
 
-                    // check if directory exists
+                    // check if project directory exists
                     try
                     {
-                        string route = FTPServerBaseUrl + FTPServerPath;
+                        string route = FTPServerBaseUrl + project.Name + "/";
                         FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
                         //softwareVersion.FirmwarePath = route;
 
@@ -125,13 +133,44 @@ namespace OTAWebApp.Controllers
                     }
                     catch (WebException ex)
                     {
-                        //return new BadRequestResult();
-                        //throw new Exception((ex.Response as FtpWebResponse).StatusDescription);
+                        // directory already exist I know that is weak but there is no way to check if a folder exist on ftp...
+                    }
+                    // check if software type directory exists
+                    try
+                    {
+                        string route = FTPServerBaseUrl + FTPServerProjectPaht + FTPServerSoftwareTypePath;
+                        FtpWebRequest request = (FtpWebRequest)WebRequest.Create(route);
+                        //softwareVersion.FirmwarePath = route;
+
+                        request.Method = WebRequestMethods.Ftp.MakeDirectory;
+
+                        //Enter FTP Server credentials.
+                        request.Credentials = new NetworkCredential("asanchez", "eskidefondo");
+                        request.UsePassive = true;
+                        request.UseBinary = true;
+                        request.EnableSsl = false;
+
+                        FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+
+                        if (response.StatusCode != FtpStatusCode.PathnameCreated)
+                        {
+                            // Folder already created.
+                        }
+
+                        response.Close();
+                    }
+                    catch (WebException ex)
+                    {
+                        // directory already exist I know that is weak but there is no way to check if a folder exist on ftp...
                     }
 
                     // Get the file name => /Major_Minor_Patch_Label_UniqueGuid;
-                    string FileName = softwareVersion.Major.ToString() + "_" + softwareVersion.Minor.ToString() + "_" + softwareVersion.Patch.ToString() + "_"
-                        + softwareVersion.Label.ToString() + "_" + Guid.NewGuid().ToString() + fi.Extension;
+                    string FileName = softwareVersion.Major.ToString() + "_" 
+                                        + softwareVersion.Minor.ToString() + "_"
+                                        + softwareVersion.Patch.ToString() + "_"
+                                        + softwareVersion.Label.ToString() + "_" 
+                                        + Guid.NewGuid().ToString() 
+                                        + fi.Extension;
 
                     MemoryStream fileStream = new MemoryStream();
                     file.CopyTo(fileStream);
@@ -177,19 +216,21 @@ namespace OTAWebApp.Controllers
                     return new NotFoundResult();
                 }
             }
-#endif
+#else
             softwareVersion.FirmwarePath = "route";
-            softwareVersion.Date = DateTime.Now;
             
-            if (selectedHardwareTypes == null)
-            {
-                softwareVersion.SupportedHardware = new List<HardwareType>();
-            }
-            foreach (var hardwareId in selectedHardwareTypes) 
-            {
-                softwareVersion.SupportedHardware = new List<HardwareType>();
-                softwareVersion.SupportedHardware.Add(_context.HardwareType.Where(i => i.Id.ToString() == hardwareId).FirstOrDefault());
-            }
+#endif
+            //if (selectedHardwareTypes == null)
+            //{
+            //    softwareVersion.SupportedHardware = new List<HardwareType>();
+            //}
+            //foreach (var hardwareId in selectedHardwareTypes) 
+            //{
+            //    softwareVersion.SupportedHardware = new List<HardwareType>();
+            //    softwareVersion.SupportedHardware.Add(_context.HardwareType.Where(i => i.Id.ToString() == hardwareId).FirstOrDefault());
+            //}
+
+            softwareVersion.Date = DateTime.Now;
 
             if (ModelState.IsValid)
             {
@@ -245,7 +286,7 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion, string[] selectedHardwareTypes)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,SoftwareTypeId,Major,Minor,Patch,Label,Author")] SoftwareVersion softwareVersion)
         {
             if (id != softwareVersion.Id)
             {
@@ -257,34 +298,34 @@ namespace OTAWebApp.Controllers
                .Where(i => i.Id == id)
                .Single();
 
-            if (selectedHardwareTypes != null)
-            {
-                if (selectedHardwareTypes == null)
-                {
-                    SoftwareVersionToUpdate.SupportedHardware = new List<HardwareType>();
-                }
+            //if (selectedHardwareTypes != null)
+            //{
+            //    if (selectedHardwareTypes == null)
+            //    {
+            //        SoftwareVersionToUpdate.SupportedHardware = new List<HardwareType>();
+            //    }
 
-                var selectedHardwareTypesHS = new HashSet<string>(selectedHardwareTypes);
-                var softwareHardwareTypes = new HashSet<int>(SoftwareVersionToUpdate.SupportedHardware.Select(c => c.Id));
+            //    var selectedHardwareTypesHS = new HashSet<string>(selectedHardwareTypes);
+            //    var softwareHardwareTypes = new HashSet<int>(SoftwareVersionToUpdate.SupportedHardware.Select(c => c.Id));
 
-                foreach (var hardwareType in _context.HardwareType)
-                {
-                    if (selectedHardwareTypesHS.Contains(hardwareType.Id.ToString()))
-                    {
-                        if (!softwareHardwareTypes.Contains(hardwareType.Id))
-                        {
-                            SoftwareVersionToUpdate.SupportedHardware.Add(hardwareType);
-                        }
-                    }
-                    else
-                    {
-                        if (softwareHardwareTypes.Contains(hardwareType.Id))
-                        {
-                            SoftwareVersionToUpdate.SupportedHardware.Remove(hardwareType);
-                        }
-                    }
-                }
-            }
+            //    foreach (var hardwareType in _context.HardwareType)
+            //    {
+            //        if (selectedHardwareTypesHS.Contains(hardwareType.Id.ToString()))
+            //        {
+            //            if (!softwareHardwareTypes.Contains(hardwareType.Id))
+            //            {
+            //                SoftwareVersionToUpdate.SupportedHardware.Add(hardwareType);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            if (softwareHardwareTypes.Contains(hardwareType.Id))
+            //            {
+            //                SoftwareVersionToUpdate.SupportedHardware.Remove(hardwareType);
+            //            }
+            //        }
+            //    }
+            //}
 
             //softwareVersion.SupportedHardware = SoftwareVersionToUpdate.SupportedHardware;
 

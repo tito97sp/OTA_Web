@@ -1,42 +1,71 @@
-﻿@model OTAWebApp.Models.Project
+﻿@model OTAWebApp.ViewModels.ProjectTypeIndexData
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>@ViewBag.ProjectName</h1>
 
 <div>
-    <h4>Project</h4>
+    <h4>Details</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Project.Name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Project.Name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.Project.Description)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreationDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreationDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastModificationDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastModificationDate)
+            @Html.DisplayFor(model => model.Project.Description)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Project.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
+</div>
+
+
+<div>
+    <hr />
+    @if (Model.SoftwareTypes != null)
+    {
+        <h3>Software Configurations</h3>
+
+        <table class="table">
+            <tr>
+                <th>Name</th>
+                <th>Last Modification</th>
+            </tr>
+
+            @foreach (var item in Model.SoftwareTypes)
+            {
+                string selectedRow = "";
+                if (item.Id == ViewBag.SoftwareVersionsID)
+                {
+                    selectedRow = "success";
+                }
+                <tr class="@selectedRow">
+                    <td>
+                        <a asp-action="Details" asp-controller="SoftwareTypes" asp-route-softwareTypeId="@item.Id">@item.Name</a>
+                    </td>
+                    <td>
+                        @item.LastModificationDate
+                    </td>
+                    <td>
+                        
+                        <a asp-action="Edit" asp-controller="SoftwareTypes" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-controller="SoftwareTypes" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+
+    <a asp-action="Create" asp-controller="SoftwareTypes" asp-route-projectId="@Model.Project.Id">Add new type</a>
 </div>

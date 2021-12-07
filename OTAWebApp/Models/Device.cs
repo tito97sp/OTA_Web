@@ -10,7 +10,8 @@ namespace OTAWebApp.Models
     {
         [Key]
         public int Id { get; set; }
-        public string NickName { get; set; }
+
+        public String NickName { get; set; }
         public String SerialNumber { get; set; }
         public String BoardVendor { get; set; }
         public String BoardModel { get; set; }
@@ -25,10 +26,8 @@ namespace OTAWebApp.Models
 
         public String Notes { get; set; }
 
-        public int HardwareTypeId { get; set; }
         public int SoftwareTypeId { get; set; }
 
-        public virtual HardwareType HardwareType { get; set; }
         public virtual SoftwareType SoftwareType { get; set; }
 
 

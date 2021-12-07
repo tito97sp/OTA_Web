@@ -13,7 +13,7 @@ namespace OTAWebApp.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202112052308274_init"; }
+            get { return "202112071840207_init"; }
         }
         
         string IMigrationMetadata.Source

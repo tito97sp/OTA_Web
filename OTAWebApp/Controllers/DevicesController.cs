@@ -22,7 +22,7 @@ namespace OTAWebApp.Controllers
         // GET: Devices
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Device.Include(d => d.HardwareType).Include(d => d.SoftwareType);
+            var applicationDbContext = _context.Device.Include(d => d.SoftwareType);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,6 @@ namespace OTAWebApp.Controllers
             }
 
             var device = await _context.Device
-                .Include(d => d.HardwareType)
                 .Include(d => d.SoftwareType)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (device == null)
@@ -49,7 +48,6 @@ namespace OTAWebApp.Controllers
         // GET: Devices/Create
         public IActionResult Create()
         {
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id");
             ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id");
             return View();
         }
@@ -59,7 +57,7 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NickName,SerialNumber,BoardVendor,BoardModel,BoardLabel,Software,SoftwareLabel,SoftwareVersion,GitHash,FirstSeen,LastSeen,Notes,HardwareTypeId,SoftwareTypeId")] Device device)
+        public async Task<IActionResult> Create([Bind("Id,NickName,SerialNumber,BoardVendor,BoardModel,BoardLabel,Software,SoftwareLabel,SoftwareVersion,GitHash,FirstSeen,LastSeen,Notes,SoftwareTypeId")] Device device)
         {
             if (ModelState.IsValid)
             {
@@ -67,7 +65,6 @@ namespace OTAWebApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id", device.HardwareTypeId);
             ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", device.SoftwareTypeId);
             return View(device);
         }
@@ -85,7 +82,6 @@ namespace OTAWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id", device.HardwareTypeId);
             ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", device.SoftwareTypeId);
             return View(device);
         }
@@ -95,7 +91,7 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NickName,SerialNumber,BoardVendor,BoardModel,BoardLabel,Software,SoftwareLabel,SoftwareVersion,GitHash,FirstSeen,LastSeen,Notes,HardwareTypeId,SoftwareTypeId")] Device device)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NickName,SerialNumber,BoardVendor,BoardModel,BoardLabel,Software,SoftwareLabel,SoftwareVersion,GitHash,FirstSeen,LastSeen,Notes,SoftwareTypeId")] Device device)
         {
             if (id != device.Id)
             {
@@ -122,7 +118,6 @@ namespace OTAWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["HardwareTypeId"] = new SelectList(_context.HardwareType, "Id", "Id", device.HardwareTypeId);
             ViewData["SoftwareTypeId"] = new SelectList(_context.SoftwareType, "Id", "Id", device.SoftwareTypeId);
             return View(device);
         }
@@ -136,7 +131,6 @@ namespace OTAWebApp.Controllers
             }
 
             var device = await _context.Device
-                .Include(d => d.HardwareType)
                 .Include(d => d.SoftwareType)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (device == null)

@@ -42,27 +42,42 @@ namespace OTAWebApp.Controllers
 
 
         // GET: SoftwareTypes/Details/5
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int? softwareTypeId)
         {
-            var viewModel = new SoftwareTypeIndexData();
+            var viewModel = new SoftwareTypeDetailsData();
+            
 
-            viewModel.SoftwareTypes = new[]{_context.SoftwareType
-                .Include(i => i.SoftwareVersions)
-                .FirstOrDefault(i => i.Id == id) };
+            if (softwareTypeId != null)
+            {
+                viewModel.SoftwareType = _context.SoftwareType
+                    .Include(i => i.SoftwareVersions)
+                    .Where(i => i.Id == softwareTypeId)
+                    .FirstOrDefault();
 
-            ViewBag.SoftwareTypeID = id;
-            viewModel.SoftwareVersions = viewModel.SoftwareTypes.Where(
-                i => i.Id == id).Single().SoftwareVersions;
+                viewModel.SoftwareVersions = Enumerable.Empty<SoftwareVersion>();
+                if (viewModel.SoftwareType.SoftwareVersions != null)
+                {
+                    viewModel.SoftwareVersions = viewModel.SoftwareType.SoftwareVersions
+                        .Where(i => i.SoftwareType.Id.Equals(softwareTypeId));
+                }
 
-            ViewBag.SoftwareTypeName = viewModel.SoftwareTypes.First().Name;
-
-            return View(viewModel);
+                ViewBag.SoftwareTypeID = softwareTypeId;
+                ViewBag.SoftwareTypeName = viewModel.SoftwareType.Name;
+                
+                return View(viewModel);
+            }
+            return new BadRequestResult();            
         }
 
         // GET: SoftwareTypes/Create
-        public IActionResult Create()
+        public IActionResult Create(int projectId)
         {
-            return View();
+            if (projectId != null)
+            {
+                ViewBag.ProjectId = projectId;
+                return View();
+            }
+            return new BadRequestResult();
         }
 
         // POST: SoftwareTypes/Create
@@ -70,8 +85,11 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Date,Description")] SoftwareType softwareType)
+        public async Task<IActionResult> Create([Bind("Id,Name,Date,Description,ProjectId")] SoftwareType softwareType)
         {
+            softwareType.CreationDate = DateTime.Now;
+            softwareType.LastModificationDate = DateTime.Now;
+
             if (ModelState.IsValid)
             {
                 _context.Add(softwareType);

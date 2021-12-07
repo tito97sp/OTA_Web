@@ -16,13 +16,13 @@ namespace OTAWebApp.Models
         public int SoftwareTypeId {get; set;}
 
         [Required]
-        public uint Major { get; set; }
+        public int Major { get; set; }
 
         [Required]
-        public uint Minor { get; set; }
+        public int Minor { get; set; }
         
         [Required]
-        public uint Patch { get; set; }
+        public int Patch { get; set; }
 
         [Required] [StringLength(50, MinimumLength= 1)]
         public string Label { get; set; }
@@ -43,7 +43,6 @@ namespace OTAWebApp.Models
         }
 
         public virtual SoftwareType SoftwareType { get; set; }
-       
         public virtual ICollection<HardwareType> SupportedHardware { get; set; }
     }
 }

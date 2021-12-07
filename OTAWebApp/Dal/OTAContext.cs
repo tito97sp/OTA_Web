@@ -16,6 +16,8 @@ namespace OTAWebApp.Dal
 
         public DbSet<SoftwareType> SoftwareTypes { get; set; }
         public DbSet<SoftwareVersion> SoftwareVersions { get; set; }
+        public DbSet<Device> Devices { get; set; }
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

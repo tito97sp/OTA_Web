@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OTAWebApp.Data;
 using OTAWebApp.Models;
+using OTAWebApp.ViewModels;
 
 namespace OTAWebApp.Controllers
 {
@@ -26,21 +27,27 @@ namespace OTAWebApp.Controllers
         }
 
         // GET: Projects/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? projectId)
         {
-            if (id == null)
+            if (projectId == null)
             {
                 return NotFound();
             }
 
-            var project = await _context.Project
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (project == null)
+            var projectTypeIndexData = new ProjectTypeIndexData();
+            projectTypeIndexData.Project = _context.Project
+                .FirstOrDefault(m => m.Id == projectId);
+            if (projectTypeIndexData.Project == null)
             {
-                return NotFound();
+                return new NotFoundResult();
             }
 
-            return View(project);
+            projectTypeIndexData.SoftwareTypes = _context.SoftwareType
+                .Where(i => i.Project.Id == projectId);
+
+            ViewBag.ProjectName = projectTypeIndexData.Project.Name;
+
+            return View(projectTypeIndexData);
         }
 
         // GET: Projects/Create
@@ -54,8 +61,11 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,CreationDate,LastModificationDate")] Project project)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Project project)
         {
+            project.CreationDate = DateTime.Now;
+            project.LastModificationDate = DateTime.Now;
+
             if (ModelState.IsValid)
             {
                 _context.Add(project);
@@ -86,8 +96,10 @@ namespace OTAWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreationDate,LastModificationDate")] Project project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Project project)
         {
+            project.LastModificationDate = DateTime.Now;
+
             if (id != project.Id)
             {
                 return NotFound();

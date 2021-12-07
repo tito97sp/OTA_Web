@@ -10,7 +10,8 @@ namespace OTAWebApp.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
+
+        public String Name { get; set; }
         public String Description { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime LastModificationDate { get; set; }

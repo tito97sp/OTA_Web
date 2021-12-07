@@ -31,6 +31,7 @@ namespace OTAWebApp
             var DockerEnv = Environment.GetEnvironmentVariable("DOCKER");
             if (DockerEnv != null)
             {
+
                 if (DockerEnv == "true")
                 {
                     services.AddDbContext<ApplicationDbContext>(options =>

@@ -15,9 +15,9 @@ namespace OTAWebApp.Data
         }
         public DbSet<OTAWebApp.Models.SoftwareType> SoftwareType { get; set; }
         public DbSet<OTAWebApp.Models.SoftwareVersion> SoftwareVersion { get; set; }
-        public DbSet<OTAWebApp.Models.Device> Device { get; set; }
         public DbSet<OTAWebApp.Models.HardwareType> HardwareType { get; set; }
         public DbSet<OTAWebApp.Models.Project> Project { get; set; }
+        public DbSet<OTAWebApp.Models.Device> Device { get; set; }
 
         
     }

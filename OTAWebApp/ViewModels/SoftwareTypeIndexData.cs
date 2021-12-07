@@ -11,4 +11,10 @@ namespace OTAWebApp.ViewModels
         public IEnumerable<SoftwareType> SoftwareTypes { get; set; }
         public IEnumerable<SoftwareVersion> SoftwareVersions { get; set; }
     }
+
+    public class SoftwareTypeDetailsData
+    {
+        public SoftwareType SoftwareType { get; set; }
+        public IEnumerable<SoftwareVersion> SoftwareVersions { get; set; }
+    }
 }
