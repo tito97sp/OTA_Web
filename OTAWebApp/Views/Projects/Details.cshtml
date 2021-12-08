@@ -54,7 +54,7 @@
                         <a asp-action="Details" asp-controller="SoftwareTypes" asp-route-softwareTypeId="@item.Id">@item.Name</a>
                     </td>
                     <td>
-                        @item.LastModificationDate
+                        @OTAWebApp.Utils.CommonTools.DateFormated(item.LastModificationDate)
                     </td>
                     <td>
                         

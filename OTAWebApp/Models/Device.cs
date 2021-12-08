@@ -30,6 +30,5 @@ namespace OTAWebApp.Models
 
         public virtual SoftwareType SoftwareType { get; set; }
 
-
     }
 }

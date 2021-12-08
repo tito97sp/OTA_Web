@@ -19,13 +19,7 @@
                 @Html.DisplayNameFor(model => model.SerialNumber)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BoardVendor)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.BoardModel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BoardLabel)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Software)
@@ -37,19 +31,7 @@
                 @Html.DisplayNameFor(model => model.SoftwareVersion)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.GitHash)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstSeen)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.LastSeen)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SoftwareType)
             </th>
             <th></th>
         </tr>
@@ -64,13 +46,7 @@
                 @Html.DisplayFor(modelItem => item.SerialNumber)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.BoardVendor)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.BoardModel)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BoardLabel)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Software)
@@ -82,19 +58,7 @@
                 @Html.DisplayFor(modelItem => item.SoftwareVersion)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.GitHash)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstSeen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastSeen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SoftwareType.Id)
+                @OTAWebApp.Utils.CommonTools.DateFormated(item.LastSeen)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
