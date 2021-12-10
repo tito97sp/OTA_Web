@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace OTAWebApp.Models
@@ -33,8 +34,8 @@ namespace OTAWebApp.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
-        
-        public string FirmwarePath { get; set; }
+
+        public string FirmwarePath { get; set; } = "not set";
 
         [Display(Name = "Full Version")]
         public string FullVersion
@@ -44,5 +45,40 @@ namespace OTAWebApp.Models
 
         public virtual SoftwareType SoftwareType { get; set; }
         public virtual ICollection<HardwareType> SupportedHardware { get; set; }
+
+        public string createUniqueId() 
+        {
+            var uniqueId = Major.ToString() + "_"
+                            + Minor.ToString() + "_"
+                            + Patch.ToString() + "_"
+                            + Label.ToString() + "_"
+                            + Guid.NewGuid().ToString();
+            return uniqueId;
+        }
+        public bool isValid()
+        {
+            Type t = this.GetType();
+
+            var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var prop in properties)
+            {
+                if (prop.Name.Equals("SoftwareType") 
+                    || prop.Name.Equals("SupportedHardware"))
+                { 
+                }
+                else {
+                    var value = prop.GetValue(this, null);
+
+                    if (value == null /*&& (string)value != ""*/)
+                    {
+                        return false;
+                    } 
+                }
+            }
+
+            return true;
+        }
+
     }
 }
