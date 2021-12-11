@@ -1,3 +1,5 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+
 version: '3.4'
 
 services:
@@ -38,7 +40,7 @@ services:
     restart: always
 
   otawebapp:
-    image: ${DOCKER_REGISTRY-}otawebapp
+    image: otawebapp
     build:
       network: host
       context: .
@@ -54,12 +56,13 @@ services:
       - ota_network
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
     restart: always
 
 volumes:
   mssql_vol:
   ftpd_vol:
-  
   
 networks:
   ota_network:
